@@ -40,7 +40,7 @@ class Node(object):
         winner = state.play(move_played)
         if winner != 0:
             self.children[id_to_play] = Node([])
-            if state.bobai_to_play:
+            if state.bobail_to_play:
                 res = 1
             else:
                 if state.player == winner:
@@ -49,12 +49,12 @@ class Node(object):
                     res = -1
         elif self.children[id_to_play] == None:
             self.children[id_to_play] = Node(state.possible_plays())
-            if state.bobai_to_play:
+            if state.bobail_to_play:
                 res = -state.rollout_rec(0)
             else:
                 res = state.rollout_rec(0)
         else:
-            if state.bobai_to_play:
+            if state.bobail_to_play:
                 res = -self.children[id_to_play].mcts(state)
             else:
                 res = self.children[id_to_play].mcts(state)

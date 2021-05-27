@@ -56,7 +56,7 @@ class Application(Frame):
         for j in range(5): # The pieces
             self.pieces[(0,j)] = self.canv.create_oval(*circle_coords(0,j), width = 6, outline = "grey", fill = "white")
             self.pieces[(4,j)] = self.canv.create_oval(*circle_coords(4,j), width = 6, outline = "grey", fill = "black")
-        self.pieces[(2,2)] = self.canv.create_oval(*circle_coords(2,2), width = 6, outline = "grey", fill = "red") # the bobai
+        self.pieces[(2,2)] = self.canv.create_oval(*circle_coords(2,2), width = 6, outline = "grey", fill = "red") # the bobail
         self.possible_moves_circle_ids = [] # empty list that will be used for the green circle of possible moves
         self.is_moving = False # to prevent from doing ai_plays when a pawn is moving, otherwise it makes some lags (the pawn plays too slowly)
         self.doing_undo = False # prevent from undoing when it is currently undoing
@@ -159,21 +159,21 @@ class Application(Frame):
     # -------- Starting the turns --------
 
     def initiate_turn(self):
-        """Function called at the beginning of each turn and that will either call the ai, or initiate the moves for the bobai or pawns if it is a real player"""
+        """Function called at the beginning of each turn and that will either call the ai, or initiate the moves for the bobail or pawns if it is a real player"""
         if self.is_won:
             return 
         self.current_player_label.configure(bg="black" if self.state.player == 1 else "white",fg="black" if self.state.player == 2 else "white")
         self.update()
         if self.state.player in self.real_players:
-            if self.state.bobai_to_play:
-                self.initiate_bobai_turn()
+            if self.state.bobail_to_play:
+                self.initiate_bobail_turn()
             else:
                 self.color_playable_pawns()
         else:
             self.after(1, self.ai_turn)
 
-    def initiate_bobai_turn(self):
-        """Initiate the moves for the bobai"""
+    def initiate_bobail_turn(self):
+        """Initiate the moves for the bobail"""
         self.add_possible_moves(self.state.possible_plays())
 
     def color_playable_pawns(self):
@@ -223,8 +223,8 @@ class Application(Frame):
     def _click(self,event):
         """Event function called when the board is clicked. Will update the possible moves, or play a move"""
         j, i = grid_position(event.x-20, event.y-20)
-        if self.state.bobai_to_play:
-            move = (self.state.bobai_pos, (i,j))
+        if self.state.bobail_to_play:
+            move = (self.state.bobail_pos, (i,j))
             if move in self.state.possible_plays():
                 self.play_on_data_and_graphic(move)
                 self.initiate_turn()

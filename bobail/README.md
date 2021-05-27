@@ -1,4 +1,4 @@
-# Bobai AI and interface
+# Bobail AI and interface
 
 This folder contains python scripts to play the bobai agains an AI.
 
@@ -18,3 +18,5 @@ The first player only moves a pawn, and then a player's turn consists in moving 
 If the bobai ends up on the row a player (even if the opponent put it there), it is a win for this player.
 
 If a player cannot play (most of the time, if the bobai completely blocked), they loses.
+
+It is possible to play online at [Board Game Arena](https://fr.boardgamearena.com/gamepanel?game=bobail)
