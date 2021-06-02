@@ -28,7 +28,6 @@ class Node(object):
             if score > best_value:
                 best_value = score
                 best_id = i
-                                                                  
         return best_id
     def best_id_to_play(self):
         return max((self.nb_wins[i]/self.nb_tests[i],i) for i in range(len(self.moves)))[1]
@@ -38,15 +37,12 @@ class Node(object):
             return 0
         move_played = self.moves[id_to_play]
         winner = state.play(move_played)
-        if winner != 0:
+        if winner != None:
             self.children[id_to_play] = Node([])
-            if state.bobail_to_play:
+            if winner:
                 res = 1
             else:
-                if state.player == winner:
-                    res = 1
-                else:
-                    res = -1
+                res = -1
         elif self.children[id_to_play] == None:
             self.children[id_to_play] = Node(state.possible_plays())
             if state.bobail_to_play:
@@ -63,3 +59,11 @@ class Node(object):
         self.nb_wins[id_to_play] += res
         self.total_nb_tests += 1
         return res
+    def print_scores(self, current_depth, max_depth):
+        if current_depth < max_depth:
+            for i in range(len(self.moves)):
+                if self.children[i] != None:
+                    print(" |"*current_depth, self.moves[i], self.nb_wins[i]/self.nb_tests[i], self.nb_tests[i])
+                    if self.nb_tests[i]*10 >= self.total_nb_tests:
+                        self.children[i].print_scores(current_depth+1, max_depth)
+        

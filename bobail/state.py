@@ -21,6 +21,7 @@ class State:
             print(f"{4-i}|"+"".join(" XOB"[k] for k in self.grid[i])+"|")
         print("  −−−−−")
         print("  ABCDE")
+        print(self.pawns_positions)
     def possible_plays(self):
         if self.bobail_to_play:
             return self.possible_bobail_plays()
@@ -52,11 +53,11 @@ class State:
         bobail_pos = end
         self.bobail_to_play = False
         if self.bobail_pos[0] == 4:
-            return 1
+            return self.player == 1
         elif self.bobail_pos[0] == 0:
-            return 2
+            return self.player == 2
         else:
-            return 0
+            return None
     def play_pawn(self, move):
         start, end = move
         self.grid[start[0]][start[1]] = 0
@@ -65,7 +66,7 @@ class State:
         self.pawns_positions[self.player-1].add(end)
         self.player = 3-self.player
         self.bobail_to_play = True
-        return 3-self.player if len(self.possible_bobail_plays()) == 0 else 0
+        return True if len(self.possible_bobail_plays()) == 0 else None
     def unplay(self, move):
         if self.bobail_to_play:
             return self.unplay_pawn(move)
@@ -91,22 +92,26 @@ class State:
         plays = self.possible_plays()
         if len(plays) == 0:
             return -1
-        """for move in plays:
+        interesting_moves = []
+        for move in plays:
             winner = self.play(move)
-            if self.player == winner:
-                res = 1
-            self.unplay(move)"""
-        move_played = random.choice(plays)
-        winner = self.play(move_played)
-        if winner != 0:
-            if self.player == winner:
-                res = 1
+            if winner != None:
+                if winner:
+                    self.unplay(move)
+                    return 1#float("inf")
             else:
-                res = -1
+                interesting_moves.append(move)
+            self.unplay(move)
+        if len(interesting_moves) == 0:
+            return -1#float("-inf")
+        move_played = random.choice(interesting_moves)
+        winner = self.play(move_played)
+        if winner != None:
+            raise ValueError("It should not be possible to be there")
         else:
             if self.bobail_to_play:
-                res = -self.rollout_rec(depth+1)
+                res = max(float("-inf") if len(interesting_moves) == 1 else -1,-self.rollout_rec(depth+1))
             else:
-                res = self.rollout_rec(depth+1)
+                res = max(float("-inf") if len(interesting_moves) == 1 else -1,self.rollout_rec(depth+1))
         self.unplay(move_played)
         return res

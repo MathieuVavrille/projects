@@ -106,10 +106,8 @@ class Application(Frame):
 
     def update_mcts_root_node(self, move):
         """Update the mcts root node by playing a move"""
-        id_of_move = self.mcts_root_node.id_of_move(move)
-        self.mcts_root_node = self.mcts_root_node.children[id_of_move]
-        if self.mcts_root_node == None:
-            self.mcts_root_node = Node(self.state.possible_plays())
+        self.mcts_root_node = self.mcts_root_node.child_with_move(move)
+        self.mcts_root_node = Node(self.state.possible_plays())
 
     def unplay_on_data(self, move):
         """Unplay the move on the data"""
