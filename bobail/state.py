@@ -14,14 +14,13 @@ class State:
         self.bobail_pos = (2,2)
         self.pawns_positions = [{(4,j) for j in range(5)}, {(0,j) for j in range(5)}]
     def print_state(self):
-        """print(f"Turn of player {self.player}, with {['X','O'][self.player-1]}")
-        print(f"Play {['a pawn', 'the bobail'][self.bobail_to_play]}")"""
+        print(f"Turn of player {self.player}, with {['X','O'][self.player-1]}")
+        print(f"Play {['a pawn', 'the bobail'][self.bobail_to_play]}")
         print("  −−−−−")
         for i in range(5):
             print(f"{4-i}|"+"".join(" XOB"[k] for k in self.grid[i])+"|")
         print("  −−−−−")
         print("  ABCDE")
-        print(self.pawns_positions)
     def possible_plays(self):
         if self.bobail_to_play:
             return self.possible_bobail_plays()
@@ -98,12 +97,12 @@ class State:
             if winner != None:
                 if winner:
                     self.unplay(move)
-                    return 1#float("inf")
+                    return float("inf")
             else:
                 interesting_moves.append(move)
             self.unplay(move)
         if len(interesting_moves) == 0:
-            return -1#float("-inf")
+            return float("-inf")
         move_played = random.choice(interesting_moves)
         winner = self.play(move_played)
         if winner != None:
