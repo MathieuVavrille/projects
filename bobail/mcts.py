@@ -14,8 +14,9 @@ class Node(object):
         for i in range(len(self.moves)):
             if self.moves[i] == move:
                 return i
-        print("Error during id_of_move")
-        raise ValueError("Wrong move")
+        raise ValueError("Wrong move for child")
+    def child_with_move(self,move):
+        return self.children[self.id_of_move(move)]
     def get_id_to_play(self):
         if len(self.moves) == 0:
             return -1
