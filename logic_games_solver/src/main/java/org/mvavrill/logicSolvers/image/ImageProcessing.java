@@ -18,6 +18,18 @@ public class ImageProcessing {
     this.image = image;
   }
 
+  /*public static ImageProcessing fromFile(final String fileName, final double scaling) {
+    BufferedImage img = null;
+    try {
+      img = ImageIO.read(new File(fileName));
+    }
+    catch (IOException e) {
+      System.out.println(e);
+      System.exit(0);
+    }
+    return new ImageProcessing(toGrayScale(img));
+    }*/
+
   public static ImageProcessing fromFile(final String fileName) {
     BufferedImage img = null;
     try {
@@ -81,27 +93,6 @@ public class ImageProcessing {
     return convolutionFilter(filter);
   }
 
-  public ImageProcessing binarize(final double ratioRemoved) {
-    List<Double> values = new ArrayList<Double>();
-    for (int i = 0; i < image.length; i++)
-      for (int j = 0; j < image[i].length; j++)
-        values.add(image[i][j]);
-    double[] sortedValues = values.stream().mapToDouble(v -> v).sorted().toArray();
-    double threshold = sortedValues[(int) (ratioRemoved*sortedValues.length)];
-    System.out.println(threshold);
-    double[][] binarized = new double[image.length][image[0].length];
-    for (int i = 0; i < image.length; i++)
-      for (int j = 0; j < image[i].length; j++)
-        binarized[i][j] = image[i][j] < threshold ? 0 : 1;
-    return new ImageProcessing(binarized);
-  }
-
-  private static double valueOrDefault(int I,int J,int i,int j, double[][] mat) {
-    if (I < 0 || I >= mat.length || J < 0 || J >= mat[i].length)
-      return mat[i][j];
-    return mat[I][J];
-  }
-
   public ImageProcessing convolutionFilter(final double[][] filter) {
     if (filter.length != filter[0].length)
       throw new IllegalStateException("Filter is not square");
@@ -121,6 +112,42 @@ public class ImageProcessing {
     return new ImageProcessing(output);
   }
 
+  public ImageProcessing binarize(final double ratioRemoved) {
+    List<Double> values = new ArrayList<Double>();
+    for (int i = 0; i < image.length; i++)
+      for (int j = 0; j < image[i].length; j++)
+        values.add(image[i][j]);
+    double[] sortedValues = values.stream().mapToDouble(v -> v).sorted().toArray();
+    double threshold = sortedValues[(int) (ratioRemoved*sortedValues.length)];
+    System.out.println(threshold);
+    double[][] binarized = new double[image.length][image[0].length];
+    for (int i = 0; i < image.length; i++)
+      for (int j = 0; j < image[i].length; j++)
+        binarized[i][j] = image[i][j] < threshold ? 0 : 1;
+    return new ImageProcessing(binarized);
+  }
+
+  public boolean[][] binarizeBool(final double ratioRemoved) {
+    List<Double> values = new ArrayList<Double>();
+    for (int i = 0; i < image.length; i++)
+      for (int j = 0; j < image[i].length; j++)
+        values.add(image[i][j]);
+    double[] sortedValues = values.stream().mapToDouble(v -> v).sorted().toArray();
+    double threshold = sortedValues[(int) (ratioRemoved*sortedValues.length)];
+    System.out.println(threshold);
+    boolean[][] binarized = new boolean[image.length][image[0].length];
+    for (int i = 0; i < image.length; i++)
+      for (int j = 0; j < image[i].length; j++)
+        binarized[i][j] = image[i][j] < threshold ? false : true;
+    return binarized;
+  }
+
+  private static double valueOrDefault(int I,int J,int i,int j, double[][] mat) {
+    if (I < 0 || I >= mat.length || J < 0 || J >= mat[i].length)
+      return mat[i][j];
+    return mat[I][J];
+  }
+
   public static int[][] normalize(final double[][] image) {
     double max = Arrays.stream(image).mapToDouble(line -> Arrays.stream(line).max().getAsDouble()).max().getAsDouble();
     double min = Arrays.stream(image).mapToDouble(line -> Arrays.stream(line).min().getAsDouble()).min().getAsDouble();
@@ -129,6 +156,29 @@ public class ImageProcessing {
       for (int j = 0; j < normalized[i].length; j++)
         normalized[i][j] = (int) Math.round((255*(image[i][j]-min))/(max-min));
     return normalized;
+  }
+
+  public static int nbNeighbors(final boolean[][] image, final int i, final int j) {
+    int res = 0;
+    for (int k = -1; k < 2; k++)
+      for (int l = -1; l < 2; l++)
+        res += (0 <= i+k && i+k < image.length && 0 <= j+l && j+l < image[i+k].length && image[i+k][j+l]) ? 1 : 0;
+    return res;
+  }
+  
+  public static void removeLonely(final boolean[][] image) {
+    boolean modified = true;
+    while (modified) {
+      modified = false;
+      for (int i = 0; i < image.length; i++) {
+        for (int j = 0; j < image[i].length; j++) {
+          if (image[i][j] && nbNeighbors(image, i, j) <= 2) {
+            image[i][j] = false;
+            modified = true;
+          }
+        }
+      }
+    }
   }
 
   public void saveToFile(final String fileName) {
